@@ -19,17 +19,15 @@ struct node{
 struct node *ROOT;
 struct node *NILL;
 
-void left_rotate(struct node *x);
-void right_rotate(struct node *x);
-void tree_print(struct node *x);
+void left_rotate(struct node *);
+void right_rotate(struct node *);
+void tree_print(struct node *);
 void red_black_insert(int num, char *data, int prc);
-void red_black_insert_fixup(struct node *z);
-struct node *tree_search(int key);
-struct node *tree_minimum(struct node *x);
+void red_black_insert_fixup(struct node *);
 
 int main(){
 	NILL = malloc(sizeof(struct node));
-	NILL->color = BLACK;
+	NILL -> color = BLACK;
 
 	ROOT = NILL;
 	
@@ -43,7 +41,7 @@ int main(){
 		printf("\n ==========================================\n");
 		printf("\tInventory Management Program\n");
 		printf(" ==========================================\n\n");
-		printf(" 1: Input data\n");
+		printf(" 1: Insert data\n");
 		printf(" 2: Display data\n");
 		printf(" 3: EXIT\n");
 		printf("\n Enter your option : ");
@@ -83,16 +81,9 @@ int main(){
 void tree_print(struct node *x){
 	if(x != NILL){
 		tree_print(x->left);
-		printf(" | %d | %s\t  | Rp%d  |\n", x-> id, x -> stock, x->price);
+		printf(" | %d | %s\t  | Rp%d  |\n", x->id, x->stock, x->price);
 		tree_print(x->right);
 	}
-}
-
-struct node *tree_minimum(struct node *x){
-	while(x->left != NILL){
-		x = x->left;
-	}
-	return x;
 }
 
 void red_black_insert(int num, char *data, int prc){
