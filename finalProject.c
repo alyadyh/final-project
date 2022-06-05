@@ -25,7 +25,8 @@ void right_rotate(struct node *);
 void tree_print(struct node *);
 void red_black_insert(int num, char *data, int prc);
 void red_black_insert_fixup(struct node *);
-void searching(int key);
+struct node *searching(int key);
+void deleteNode(struct node *);
 
 int main()
 {
@@ -47,7 +48,9 @@ int main()
 		printf(" 1: Insert data\n");
 		printf(" 2: Display data\n");
 		printf(" 3: Search\n");
-		printf(" 4: EXIT\n");
+		printf(" 4: Delete data\n");
+		printf(" 5: Update data\n");
+		printf(" 6: EXIT\n");
 		printf("\n Enter your option : ");
 		scanf("%d", &option);
 		switch (option)
@@ -68,21 +71,30 @@ int main()
 			}
 			break;
 		case 2:
-			printf("\n    --- Product's Catalogue --- \n\n");
-			printf(" +------+-----------------+----------+\n");
-			printf(" |  ID  |     Product     |   Price  |\n");
-			printf(" +------+-----------------+----------+\n");
-			printf(" |      |                 |          |\n");
-			tree_print(ROOT);
-			printf(" |      |                 |          |\n");
-			printf(" +------+-----------------+----------+\n");
+			if (ROOT == NILL)
+			{
+				printf("\n +-----------------------------------+\n");
+				printf(" |\t     TREE IS EMPTY \t     |\n");
+				printf(" +-----------------------------------+\n");
+			}
+			else
+			{
+				printf("\n    --- Product's Catalogue --- \n\n");
+				printf(" +------+-----------------+----------+\n");
+				printf(" |  ID  |     Product     |   Price  |\n");
+				printf(" +------+-----------------+----------+\n");
+				printf(" |      |                 |          |\n");
+				tree_print(ROOT);
+				printf(" |      |                 |          |\n");
+				printf(" +------+-----------------+----------+\n");
+			}
 			break;
 		case 3:
 			if (ROOT == NILL)
 			{
-				printf("\n+----------------------------------+\n");
-				printf("|\t    TREE IS EMPTY \t   |\n");
-				printf("+----------------------------------+\n");
+				printf("\n +-----------------------------------+\n");
+				printf(" |\t     TREE IS EMPTY \t     |\n");
+				printf(" +-----------------------------------+\n");
 			}
 			else
 			{
@@ -92,9 +104,89 @@ int main()
 				searching(search_key);
 			}
 			break;
+		case 4:
+			if (ROOT == NILL)
+			{
+				printf("\n +-----------------------------------+\n");
+				printf(" |\t     TREE IS EMPTY \t     |\n");
+				printf(" +-----------------------------------+\n");
+			}
+			else
+			{
+				struct node *data;
+				printf("\nEnter which product ID that should be deleted: ");
+				scanf("%d", &search_key);
+
+				data = searching(search_key);
+
+				if (data != NULL)
+				{
+					deleteNode(data);
+
+					printf(" +-----------------------------------+\n");
+					printf(" |\t      DATA DELETED \t     |\n");
+					printf(" +-----------------------------------+\n");
+				}
+			}
+			break;
+		case 5:
+			if (ROOT == NILL)
+			{
+				printf("\n +-----------------------------------+\n");
+				printf(" |\t     TREE IS EMPTY \t     |\n");
+				printf(" +-----------------------------------+\n");
+			}
+			else
+			{
+				struct node *data;
+				printf("\nEnter which product ID you want to update: ");
+				scanf("%d", &search_key);
+
+				data = searching(search_key);
+
+				if (data != NULL)
+				{
+					update(data);
+				}
+			}
+			break;
 		}
-	} while (option != 4);
+	} while (option != 6);
 	return 0;
+}
+
+void update(struct node *data)
+{
+	char stock[30];
+	int price;
+
+	printf("\n +----------------------------------+\n");
+	printf(" |\t   UPDATE YOUR DATA\t    |\n");
+	printf(" +----------------------------------+\n");
+
+	printf(" Name: ");
+	getchar();
+	scanf("%[^\n]", stock);
+	printf(" Price: ");
+	getchar();
+	scanf("%d", &price);
+
+	strcpy(data->stock, stock);
+	data->price = price;
+
+	printf("\n +----------------------------------+\n");
+	printf(" |\t     DATA UPDATED \t    |\n");
+	printf(" +----------------------------------+\n");
+}
+
+struct node *maximum(struct node *max)
+{
+	while (max->right != NILL)
+	{
+		max = max->right;
+	}
+
+	return max;
 }
 
 void tree_print(struct node *x)
@@ -284,24 +376,176 @@ void right_rotate(struct node *x)
 	x->parent = y;
 }
 
-void searching(int search_key)
+void deleteNode(struct node *del)
 {
-	struct node *root;
+	struct node *temp, *temp2;
+	int tempColor;
+
+	temp = del;
+	tempColor = temp->color;
+
+	if (del->right == NILL && del->left == NILL && del->parent == NILL)
+	{
+		ROOT = NILL;
+		return;
+	}
+
+	if (del->right == NILL)
+	{
+		temp2 = del->left;
+		reconnect(del, del->left);
+	}
+	else if (del->left == NILL)
+	{
+		temp2 = del->right;
+		reconnect(del, del->right);
+	}
+	else
+	{
+		temp = maximum(del->left);
+		tempColor = temp->color;
+
+		temp2 = temp->left;
+
+		if (temp->parent == del)
+		{
+			temp2->parent = temp;
+		}
+		else
+		{
+			reconnect(temp, temp->left);
+			temp->left = del->left;
+			temp->left->parent = temp;
+		}
+
+		reconnect(del, temp);
+
+		temp->right = del->right;
+		temp->right->parent = temp;
+		temp->color = del->color;
+	}
+
+	if (tempColor == BLACK)
+	{
+		deleteFixed(del);
+	}
+}
+
+void deleteFixed(struct node *del)
+{
+	struct node *temp;
+
+	while (del != ROOT && del->color == BLACK)
+	{
+		if (del == del->parent->left)
+		{
+			temp = del->parent->right;
+
+			if (temp->color == RED)
+			{
+				temp->color = BLACK;
+				del->parent->color = RED;
+				left_rotate(del->parent);
+				temp = del->parent->right;
+			}
+			if (temp->left->color == BLACK && temp->right->color == BLACK)
+			{
+				temp->color = RED;
+				del->parent->color = BLACK;
+				del = del->parent;
+			}
+			else
+			{
+				if (temp->right->color == BLACK)
+				{
+					temp->color = RED;
+					temp->left->color = BLACK;
+					right_rotate(temp);
+					temp = del->parent->right;
+				}
+
+				temp->color = del->parent->color;
+				del->parent->color = BLACK;
+				del->right->color = BLACK;
+				left_rotate(del->parent);
+				del = ROOT;
+			}
+		}
+		else
+		{
+			temp = del->parent->left;
+
+			if (temp->color == RED)
+			{
+				temp->color = BLACK;
+				del->parent->color = BLACK;
+				right_rotate(del->parent);
+				temp = del->parent->left;
+			}
+			if (temp->left->color == BLACK && temp->right->color == BLACK)
+			{
+				temp->color = RED;
+				del->parent->color = BLACK;
+				del = del->parent;
+			}
+			else
+			{
+				if (temp->left->color == BLACK)
+				{
+					temp->color = RED;
+					temp->right->color = BLACK;
+					left_rotate(temp);
+					temp = del->parent->left;
+				}
+
+				temp->color = del->parent->color;
+				del->parent->color = BLACK;
+				temp->left->color = BLACK;
+				right_rotate(del->parent);
+				del = ROOT;
+			}
+		}
+	}
+
+	del->color = BLACK;
+}
+
+void reconnect(struct node *first, struct node *second)
+{
+	if (first->parent == NILL)
+	{
+		ROOT = second;
+	}
+	else if (first == first->parent->left)
+	{
+		first->parent->left = second;
+	}
+	else if (first == first->parent->right)
+	{
+		first->parent->right = second;
+	}
+
+	second->parent = first->parent;
+}
+
+struct node *searching(int search_key)
+{
+	struct node *target;
 	int flag = 0;
 
-	root = ROOT;
+	target = ROOT;
 
-	while (root != NILL)
+	while (target != NILL)
 	{
-		if (search_key < root->id)
+		if (search_key < target->id)
 		{
-			root = root->left;
+			target = target->left;
 		}
-		else if (search_key > root->id)
+		else if (search_key > target->id)
 		{
-			root = root->right;
+			target = target->right;
 		}
-		else if (search_key == root->id)
+		else if (search_key == target->id)
 		{
 			flag = 1;
 			break;
@@ -316,14 +560,18 @@ void searching(int search_key)
 		printf(" |  ID  |     Product     |   Price  |\n");
 		printf(" +------+-----------------+----------+\n");
 		printf(" |      |                 |          |\n");
-		printf(" | %d | %s\t  | Rp%d  |\n", root->id, root->stock, root->price);
+		printf(" | %d | %s\t  | Rp%d  |\n", target->id, target->stock, target->price);
 		printf(" |      |                 |          |\n");
 		printf(" +-----------------------------------+\n\n");
+
+		return target;
 	}
 	else
 	{
 		printf("\n+----------------------------------+\n");
 		printf("|\t   Data Not Found \t   |\n");
 		printf("+----------------------------------+\n\n");
+
+		return NULL;
 	}
 }
