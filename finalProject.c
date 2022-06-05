@@ -6,7 +6,8 @@
 #define RED 0
 #define BLACK 1
 
-struct node{
+struct node
+{
 	int id;
 	char stock[20];
 	int price;
@@ -24,69 +25,90 @@ void right_rotate(struct node *);
 void tree_print(struct node *);
 void red_black_insert(int num, char *data, int prc);
 void red_black_insert_fixup(struct node *);
+void searching(int key);
 
-int main(){
+int main()
+{
 	NILL = malloc(sizeof(struct node));
-	NILL -> color = BLACK;
+	NILL->color = BLACK;
 
 	ROOT = NILL;
-	
-	int tcase, num, prc;
+
+	int tcase, num, prc, search_key;
 	char data[20];
 
 	int option;
 	system("cls");
 	do
 	{
-		printf("\n ==========================================\n");
-		printf("\tInventory Management Program\n");
-		printf(" ==========================================\n\n");
+		printf("\n +========================================+\n");
+		printf(" |\tInventory Management Program\t  |\n");
+		printf(" +========================================+\n\n");
 		printf(" 1: Insert data\n");
 		printf(" 2: Display data\n");
-		printf(" 3: EXIT\n");
+		printf(" 3: Search\n");
+		printf(" 4: EXIT\n");
 		printf("\n Enter your option : ");
 		scanf("%d", &option);
-		switch(option)
+		switch (option)
 		{
-			case 1:
-				printf("\n Number of data you want to input: ");
-				scanf("%d", &tcase);
-				while(tcase--)
-				{
-					printf("\n Enter product's ID number: ");
-					scanf("%d", &num);
-					printf(" Enter product's name: ");
-					getchar();
-					scanf("%[^\n]", &data);
-					printf(" Enter product's price: ");
-					scanf("%d", &prc);
-					red_black_insert(num, data, prc);
-				}
-				break;
-			case 2:
-				printf("\n    --- Product's Catalogue --- \n\n");
-				printf(" +------+-----------------+----------+\n");
-				printf(" |  ID  |     Product     |   Price  |\n");
-				printf(" +------+-----------------+----------+\n");
-				printf(" |      |                 |          |\n");
-				tree_print(ROOT);
-				printf(" |      |                 |          |\n");
-				printf(" +------+-----------------+----------+\n");
-				break;
+		case 1:
+			printf("\n Number of data you want to input: ");
+			scanf("%d", &tcase);
+			while (tcase--)
+			{
+				printf("\n Enter product's ID number: ");
+				scanf("%d", &num);
+				printf(" Enter product's name: ");
+				getchar();
+				scanf("%[^\n]", &data);
+				printf(" Enter product's price: ");
+				scanf("%d", &prc);
+				red_black_insert(num, data, prc);
+			}
+			break;
+		case 2:
+			printf("\n    --- Product's Catalogue --- \n\n");
+			printf(" +------+-----------------+----------+\n");
+			printf(" |  ID  |     Product     |   Price  |\n");
+			printf(" +------+-----------------+----------+\n");
+			printf(" |      |                 |          |\n");
+			tree_print(ROOT);
+			printf(" |      |                 |          |\n");
+			printf(" +------+-----------------+----------+\n");
+			break;
+		case 3:
+			if (ROOT == NILL)
+			{
+				printf("\n+----------------------------------+\n");
+				printf("|\t    TREE IS EMPTY \t   |\n");
+				printf("+----------------------------------+\n");
+			}
+			else
+			{
+				printf("\nProduct ID: ");
+				scanf("%d", &search_key);
+
+				searching(search_key);
+			}
+			break;
 		}
-	} while(option != 3);
+	} while (option != 4);
 	return 0;
 }
 
-void tree_print(struct node *x){
-	if(x != NILL){
+void tree_print(struct node *x)
+{
+	if (x != NILL)
+	{
 		tree_print(x->left);
 		printf(" | %d | %s\t  | Rp%d  |\n", x->id, x->stock, x->price);
 		tree_print(x->right);
 	}
 }
 
-void red_black_insert(int num, char *data, int prc){
+void red_black_insert(int num, char *data, int prc)
+{
 	struct node *z, *x, *y;
 	z = malloc(sizeof(struct node));
 
@@ -100,23 +122,29 @@ void red_black_insert(int num, char *data, int prc){
 	x = ROOT;
 	y = NILL;
 
-	while(x != NILL){
+	while (x != NILL)
+	{
 		y = x;
-		if(z->id <= x->id){
+		if (z->id <= x->id)
+		{
 			x = x->left;
 		}
-		else{
+		else
+		{
 			x = x->right;
 		}
 	}
 
-	if(y == NILL){
+	if (y == NILL)
+	{
 		ROOT = z;
 	}
-	else if(z->id <= y->id){
+	else if (z->id <= y->id)
+	{
 		y->left = z;
 	}
-	else{
+	else
+	{
 		y->right = z;
 	}
 
@@ -125,14 +153,18 @@ void red_black_insert(int num, char *data, int prc){
 	red_black_insert_fixup(z);
 }
 
-void red_black_insert_fixup(struct node *z){
-	while(z->parent->color == RED){
+void red_black_insert_fixup(struct node *z)
+{
+	while (z->parent->color == RED)
+	{
 
 		/* z's parent is left child of z's grand parent*/
-		if(z->parent == z->parent->parent->left){
+		if (z->parent == z->parent->parent->left)
+		{
 
 			/* z's grand parent's right child is RED */
-			if(z->parent->parent->right != NULL && z->parent->parent->right->color == RED){
+			if (z->parent->parent->right != NULL && z->parent->parent->right->color == RED)
+			{
 				z->parent->color = BLACK;
 				z->parent->parent->right->color = BLACK;
 				z->parent->parent->color = RED;
@@ -140,10 +172,12 @@ void red_black_insert_fixup(struct node *z){
 			}
 
 			/* z's grand parent's right child is not RED */
-			else{
-				
+			else
+			{
+
 				/* z is z's parent's right child */
-				if(z == z->parent->right){
+				if (z == z->parent->right)
+				{
 					z = z->parent;
 					left_rotate(z);
 				}
@@ -155,10 +189,12 @@ void red_black_insert_fixup(struct node *z){
 		}
 
 		/* z's parent is z's grand parent's right child */
-		else{
-			
+		else
+		{
+
 			/* z's left uncle or z's grand parent's left child is also RED */
-			if(z->parent->parent->left != NULL && z->parent->parent->left->color == RED){
+			if (z->parent->parent->left != NULL && z->parent->parent->left->color == RED)
+			{
 				z->parent->color = BLACK;
 				z->parent->parent->left->color = BLACK;
 				z->parent->parent->color = RED;
@@ -166,9 +202,11 @@ void red_black_insert_fixup(struct node *z){
 			}
 
 			/* z's left uncle is not RED */
-			else{
+			else
+			{
 				/* z is z's parents left child */
-				if(z == z->parent->left){
+				if (z == z->parent->left)
+				{
 					z = z->parent;
 					right_rotate(z);
 				}
@@ -182,56 +220,110 @@ void red_black_insert_fixup(struct node *z){
 	ROOT->color = BLACK;
 }
 
-void left_rotate(struct node *x){
+void left_rotate(struct node *x)
+{
 	struct node *y;
-	
+
 	/* Make y's left child x's right child */
 	y = x->right;
 	x->right = y->left;
-	if(y->left != NILL){
+	if (y->left != NILL)
+	{
 		y->left->parent = x;
 	}
 
 	/* Make x's parent y's parent and y, x's parent's child */
 	y->parent = x->parent;
-	if(y->parent == NILL){
+	if (y->parent == NILL)
+	{
 		ROOT = y;
 	}
-	else if(x == x->parent->left){
+	else if (x == x->parent->left)
+	{
 		x->parent->left = y;
 	}
-	else{
+	else
+	{
 		x->parent->right = y;
 	}
-	
+
 	/* Make x, y's left child & y, x's parent */
 	y->left = x;
 	x->parent = y;
 }
 
-void right_rotate(struct node *x){
+void right_rotate(struct node *x)
+{
 	struct node *y;
 
 	/* Make y's right child x's left child */
 	y = x->left;
 	x->left = y->right;
-	if(y->right != NILL){
+	if (y->right != NILL)
+	{
 		y->right->parent = x;
 	}
 
 	/* Make x's parent y's parent and y, x's parent's child */
 	y->parent = x->parent;
-	if(y->parent == NILL){
+	if (y->parent == NILL)
+	{
 		ROOT = y;
 	}
-	else if(x == x->parent->left){
-		x->parent->left = y;	
+	else if (x == x->parent->left)
+	{
+		x->parent->left = y;
 	}
-	else{
+	else
+	{
 		x->parent->right = y;
 	}
 
 	/* Make y, x's parent and x, y's child */
 	y->right = x;
 	x->parent = y;
+}
+
+void searching(int search_key)
+{
+	struct node *root;
+	int flag = 0;
+
+	root = ROOT;
+
+	while (root != NILL)
+	{
+		if (search_key < root->id)
+		{
+			root = root->left;
+		}
+		else if (search_key > root->id)
+		{
+			root = root->right;
+		}
+		else if (search_key == root->id)
+		{
+			flag = 1;
+			break;
+		}
+	}
+
+	if (flag == 1)
+	{
+		printf("\n +-----------------------------------+\n");
+		printf(" |\t       DATA FOUND\t     |\n");
+		printf(" +-----------------------------------+\n");
+		printf(" |  ID  |     Product     |   Price  |\n");
+		printf(" +------+-----------------+----------+\n");
+		printf(" |      |                 |          |\n");
+		printf(" | %d | %s\t  | Rp%d  |\n", root->id, root->stock, root->price);
+		printf(" |      |                 |          |\n");
+		printf(" +-----------------------------------+\n\n");
+	}
+	else
+	{
+		printf("\n+----------------------------------+\n");
+		printf("|\t   Data Not Found \t   |\n");
+		printf("+----------------------------------+\n\n");
+	}
 }
