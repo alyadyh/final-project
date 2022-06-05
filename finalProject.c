@@ -384,7 +384,7 @@ void deleteNode(struct node *del)
 	temp = del;
 	tempColor = temp->color;
 
-	if (del->right == NILL && del->left == NILL)
+	if (del->right == NILL && del->left == NILL && del->parent == NILL)
 	{
 		ROOT = NILL;
 		return;
